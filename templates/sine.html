@@ -1,0 +1,32 @@
+{{ define "title" }}Sine{{ end }}
+
+{{ define "headJS" }}
+    <script type="text/javascript">
+      var sock = new SockJS("/sockjs/sine", null, {
+        "protocols_whitelist": ["xhr-streaming"]
+      });
+
+      sock.onopen = function() {
+          console.log("open");
+          window.setInterval(function() {
+              sock.send("start");
+          }, 2000);
+      };
+      sock.onmessage = function(e) {
+          //test
+          console.log(e);
+          console.log(e.data);
+          $("#sine").append("x:" + e.data.x + "<br />");
+      };
+      sock.onclose = function() {
+          sock.send("stop");
+          console.log("close");
+      };
+    </script>
+{{ end }}
+
+{{ define "content" }}
+    <a href="/">Back</a>
+
+    <div id="sine"></div>
+{{ end }}

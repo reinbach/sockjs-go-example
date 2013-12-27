@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/igm/sockjs-go/sockjs"
 	"html/template"
 	"log"
+	"math"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var folder_static = "./"
@@ -17,7 +20,8 @@ func main() {
 	log.Println("server started...")
 
 	sockjs.Install("/sockjs/echo", sockEchoHandler, sockjs.DefaultConfig)
-	sockjs.Install("/sockjs/ping", sockEchoHandler, sockjs.DefaultConfig)
+	sockjs.Install("/sockjs/ping", sockPingHandler, sockjs.DefaultConfig)
+	sockjs.Install("/sockjs/sine", sockSineHandler, sockjs.DefaultConfig)
 
 	http.Handle("/static/", http.FileServer(http.Dir(folder_static)))
 	http.HandleFunc("/", pageHandler)
@@ -63,6 +67,47 @@ func sockEchoHandler(conn sockjs.Conn) {
 			return
 		} else {
 			go func() { conn.WriteMessage(msg) }()
+		}
+	}
+}
+
+func sockPingHandler(conn sockjs.Conn) {
+	log.Println("ping session")
+	for {
+		if msg, err := conn.ReadMessage(); err != nil {
+			log.Println("getting err:", err)
+			return
+		} else {
+			if string(msg) == `"ping"` {
+				go func() {
+					conn.WriteMessage([]byte(`"pong"`))
+				}()
+			}
+		}
+	}
+}
+
+func sockSineHandler(conn sockjs.Conn) {
+	log.Println("sine session")
+
+	var x, y float64
+	var sine string
+
+	for {
+		if msg, err := conn.ReadMessage(); err != nil {
+			log.Println("getting err:", err)
+			return
+		} else {
+			if string(msg) == `"start"` {
+				go func() {
+					x = float64(time.Now().Unix())
+					y = 2.5 * (1 + math.Sin(x))
+					sine = fmt.Sprintf(`{"x": "%f", "y": "%f"}`, x, y)
+					log.Printf(sine)
+					conn.WriteMessage([]byte(sine))
+					time.Sleep(100)
+				}()
+			}
 		}
 	}
 }
