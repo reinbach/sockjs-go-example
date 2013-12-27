@@ -1,0 +1,30 @@
+{{ define "headJS"}}
+    <script type="text/javascript">
+      var sock = new SockJS("/sockjs/echo", null, {
+        "protocols_whitelist": ["xhr-streaming"]
+      });
+
+      sock.onopen = function() {
+          console.log("open");
+          window.setInterval(function() {
+              sock.send("{'name':'greg', 'surname':'reinbach'}");
+          }, 2000);
+      };
+      sock.onmessage = function(e) {
+          $("#echo").append(e.data + "<br />");
+      };
+      sock.onclose = function() {
+          console.log("close");
+      };
+    </script>
+{{ end }}
+
+{{ define "title" }}
+    Echo
+{{ end }}
+
+{{ define "content" }}
+    <a href="/">Back</a>
+
+    <div id="echo"></div>
+{{ end }}

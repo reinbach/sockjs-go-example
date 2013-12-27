@@ -1,0 +1,26 @@
+{{ define "title" }}Ping{{ end }}
+
+{{ define "headJS" }}
+    <script type="text/javascript">
+      var sock = new SockJS("/sockjs/ping", null, {
+        "protocols_whitelist": ["xhr-streaming"]
+      });
+
+      sock.onopen = function() {
+          console.log("open");
+          window.setInterval(function() {
+              sock.send("ping");
+          }, 2000);
+      };
+      sock.onmessage = function(e) {
+          console.log("message", e.data);
+      };
+      sock.onclose = function() {
+          console.log("close");
+      };
+    </script>
+{{ end }}
+
+{{ define "content" }}
+    <a href="/">Back</a>
+{{ end }}
