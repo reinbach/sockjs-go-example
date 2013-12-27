@@ -13,7 +13,7 @@
           }, 2000);
       };
       sock.onmessage = function(e) {
-          console.log("message", e.data);
+          $("#ping").append(e.data + "<br />");
       };
       sock.onclose = function() {
           console.log("close");
@@ -23,4 +23,6 @@
 
 {{ define "content" }}
     <a href="/">Back</a>
+
+    <div id="ping"></div>
 {{ end }}
