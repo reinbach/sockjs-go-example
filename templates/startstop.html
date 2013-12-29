@@ -1,0 +1,49 @@
+{{ define "title" }}Start/Stop{{ end }}
+
+{{ define "headJS" }}
+    <script type="text/javascript">
+      var sock = new SockJS("/sockjs/startstop", null, {
+        "protocols_whitelist": ["xhr-streaming"]
+      });
+
+      sock.onopen = function() {
+          console.log("open");
+      };
+      sock.onmessage = function(e) {
+          $("#start-stop").append(e.data + "<br />");
+      };
+      sock.onclose = function() {
+          sock.send("stop");
+          console.log("close");
+      };
+
+      $(document).ready(function() {
+          $("#start").on("click", function() {
+              console.log("sending start message...");
+              sock.send("start");
+          });
+
+          $("#stop").on("click", function() {
+              console.log("sending stop message...");
+              sock.send("stop");
+          });
+
+          $("#clear").on("click", function() {
+              console.log("clearing message...");
+              $("#start-stop").html("");
+          });
+      });
+    </script>
+{{ end }}
+
+{{ define "content" }}
+    <a href="/">Back</a>
+
+    <p>
+      <button id="start" class="btn">Start</button>
+      <button id="stop" class="btn">Stop</button>
+      <button id="clear" class="btn">Clear</button>
+    </p>
+
+    <div id="start-stop"></div>
+{{ end }}
