@@ -8,25 +8,42 @@
 
       sock.onopen = function() {
           console.log("open");
-          window.setInterval(function() {
-              sock.send("start");
-          }, 2000);
       };
       sock.onmessage = function(e) {
-          //test
-          console.log(e);
-          console.log(e.data);
           $("#sine").append("x:" + e.data.x + "<br />");
       };
       sock.onclose = function() {
           sock.send("stop");
           console.log("close");
       };
+
+      $(document).ready(function() {
+          $("#start").on("click", function() {
+              console.log("sending start message...");
+              sock.send("start");
+          });
+
+          $("#stop").on("click", function() {
+              console.log("sending stop message...");
+              sock.send("stop");
+          });
+
+          $("#clear").on("click", function() {
+              console.log("clearing message...");
+              $("#sine").html("");
+          });
+      });
     </script>
 {{ end }}
 
 {{ define "content" }}
     <a href="/">Back</a>
+
+    <p>
+      <button id="start" class="btn">Start</button>
+      <button id="stop" class="btn">Stop</button>
+      <button id="clear" class="btn">Clear</button>
+    </p>
 
     <div id="sine"></div>
 {{ end }}
