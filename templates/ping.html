@@ -8,12 +8,14 @@
 
       sock.onopen = function() {
           console.log("open");
+          msg = "ping";
           window.setInterval(function() {
-              sock.send("ping");
+              $("#ping").append("you: " + msg + "<br />")
+              sock.send(msg);
           }, 2000);
       };
       sock.onmessage = function(e) {
-          $("#ping").append(e.data + "<br />");
+          $("#ping").append("server: " + e.data + "<br />");
       };
       sock.onclose = function() {
           console.log("close");

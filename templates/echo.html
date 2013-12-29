@@ -6,12 +6,14 @@
 
       sock.onopen = function() {
           console.log("open");
+          msg = "{'message':'Hello, World!'}";
           window.setInterval(function() {
-              sock.send("{'name':'greg', 'surname':'reinbach'}");
+              $("#echo").append("you: " + msg + "<br />");
+              sock.send(msg);
           }, 2000);
       };
       sock.onmessage = function(e) {
-          $("#echo").append(e.data + "<br />");
+          $("#echo").append("server: " + e.data + "<br />");
       };
       sock.onclose = function() {
           console.log("close");
